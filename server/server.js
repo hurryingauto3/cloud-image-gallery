@@ -1,9 +1,14 @@
 require('dotenv').config();
-const { Storage } = require('@google-cloud/storage');
+
 const cors = require('cors');
 const express = require('express');
+const path = require('path'); // Add this line to import the path module
 const app = express();
+const { Storage } = require('@google-cloud/storage');
+
+
 app.use(cors());
+app.use(express.static(path.join(__dirname, '../build')));
 
 // Initialize the Google Cloud Storage client with credentials
 const storage = new Storage({
@@ -11,7 +16,8 @@ const storage = new Storage({
 });
 const folderPath = process.env.FOLDER_PATH;
 const bucketName = process.env.BUCKET_NAME;
-const defaultPageSize = parseInt(process.env.PAGE_SIZE, 10) || 30;
+const defaultPageSize = parseInt(process.env.PAGE_SIZE, 10) || 40;
+
 
 async function listFilesInBucket(pageToken = null, pageSize = defaultPageSize) {
     const options = {
@@ -47,7 +53,14 @@ app.get('/images', async (req, res) => {
     }
 });
 
+// Handles any requests that don't match the above
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../build/index.html'));
+});
+
+
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
+

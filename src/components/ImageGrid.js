@@ -1,30 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import ImageCard from './ImageCard'; // Assuming the component is named 'ImageCard'
+import { getImagesFromAPI } from '../utils/api';
 
-async function getImagesFromAPI() {
-    try {
-        const response = await fetch('http://localhost:3001/images');
-        console.log('Raw response:', response);
-
-        const images = await response.json();
-        console.log('Parsed JSON:', images);
-
-        // Check if images is an array
-        if (!Array.isArray(images.fileUrls)) {
-            console.error('Expected an array but got:', typeof images);
-            return [];
-        }
-
-        return images.fileUrls.map((url, index) => ({
-            id: index + 1,
-            url: url,
-        }));
-    } catch (error) {
-        console.error('Failed to fetch images', error);
-        return [];
-    }
-}
 
 const ImageGrid = () => {
     const [images, setImages] = useState([]);
